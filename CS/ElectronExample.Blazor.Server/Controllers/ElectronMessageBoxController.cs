@@ -14,10 +14,6 @@ public class ElectronMessageBoxController : WindowController {
             ImageName = "Action_AboutInfo"
         };
         showMessageBoxAction.Execute += ShowMessageBoxAction_Execute;
-    }
-
-    protected override void OnActivated() {
-        base.OnActivated();
         Active["ElectronActive"] = HybridSupport.IsElectronActive;
     }
 

@@ -169,10 +169,6 @@ public class ElectronMessageBoxController : WindowController {
             ImageName = "Action_AboutInfo"
         };
         showMessageBoxAction.Execute += ShowMessageBoxAction_Execute;
-    }
-
-    protected override void OnActivated() {
-        base.OnActivated();
         Active["ElectronActive"] = HybridSupport.IsElectronActive;
     }
 
@@ -196,14 +192,26 @@ public class ElectronMessageBoxController : WindowController {
 }
 ```
 
-Implementation details:
+How the Controller works:
 
-- **Controller registration.** XAF automatically discovers Controllers declared in the Blazor module's assembly. You do not need to register the Controller manually.
-- **`TargetWindowType = WindowType.Main`.** The Action appears in the main window's toolbar regardless of the current View.
-- **`Active["ElectronActive"]`.** The Action is visible only if `HybridSupport.IsElectronActive` returns `true`. When you run the application in a browser, the Action is hidden and the native API is never called.
-- **Error handling.** The `Execute` handler is `async void`. An unhandled exception in such a method terminates the process, so the code catches exceptions and writes them to the XAF log.
-- **Parent window.**
-- **`MessageBoxOptions`.** Use the `Type` (`info`, `warning`, `error`, `question`), `Title`, `Buttons`, `DefaultId`, `CancelId`, and `Detail` properties to configure the dialog. The `ShowMessageBoxAsync` method returns a `MessageBoxResult` object. Its `Response` property contains the index of the clicked button. Use this value to implement confirmation dialogs.
+- **Declare an XAF Action.** The Controller creates a `SimpleAction` and handles its `Execute` event. XAF renders the Action in the toolbar. You do not need custom Blazor markup.
+- **Activate the Controller in Electron mode only.** `Active["ElectronActive"] = HybridSupport.IsElectronActive` hides the Action when the application runs in a regular browser, where native APIs are unavailable.
+- **Call the native API in the `Execute` handler.** Configure the dialog with `MessageBoxOptions` and pass it to `Electron.Dialog.ShowMessageBoxAsync`. Electron.NET forwards the call to the Electron main process, which displays the native OS dialog.
+- **Pass the parent window.** `Electron.WindowManager.BrowserWindows.FirstOrDefault()` returns the application window. When you pass it to `ShowMessageBoxAsync`, the dialog is modal to this window.
+- **Handle exceptions.** The handler is `async void` because the `Execute` event is synchronous. Wrap the code in `try/catch` and log errors with `Tracing.Tracer.LogError`. Otherwise, an unhandled exception can terminate the application.
+
+To configure the dialog, use the `Type` (`info`, `warning`, `error`, `question`), `Title`, `Buttons`, `DefaultId`, `CancelId`, and `Detail` properties of `MessageBoxOptions`. `ShowMessageBoxAsync` returns a `MessageBoxResult` object. Its `Response` property contains the index of the clicked button. Use this value to implement a confirmation dialog:
+
+```csharp
+var result = await Electron.Dialog.ShowMessageBoxAsync(window, new MessageBoxOptions("Delete the record?") {
+    Type = MessageBoxType.question,
+    Buttons = new[] { "Yes", "No" },
+    CancelId = 1
+});
+if (result.Response == 0) {
+    // The user clicked "Yes".
+}
+```
 
 To test the Action, run the application with the **Electron** launch profile and click **Native Message Box** in the toolbar.
 
