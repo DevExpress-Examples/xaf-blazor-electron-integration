@@ -16,28 +16,28 @@
     <EmbeddedResource Include="DatabaseUpdate\**\*.xml" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="DevExpress.ExpressApp" Version="26.1.*" />
-    <PackageReference Include="DevExpress.ExpressApp.AI" Version="26.1.*" />
-    <PackageReference Include="DevExpress.ExpressApp.AuditTrail.Xpo" Version="26.1.*" />
-    <PackageReference Include="DevExpress.ExpressApp.Chart" Version="26.1.*" />
-    <PackageReference Include="DevExpress.ExpressApp.CloneObject" Version="26.1.*" />
-    <PackageReference Include="DevExpress.ExpressApp.CodeAnalysis" Version="26.1.*" />
-    <PackageReference Include="DevExpress.ExpressApp.ConditionalAppearance" Version="26.1.*" />
-    <PackageReference Include="DevExpress.ExpressApp.Dashboards" Version="26.1.*" />
-    <PackageReference Include="DevExpress.ExpressApp.Notifications" Version="26.1.*" />
-    <PackageReference Include="DevExpress.ExpressApp.Office" Version="26.1.*" />
-    <PackageReference Include="DevExpress.ExpressApp.PivotGrid" Version="26.1.*" />
-    <PackageReference Include="DevExpress.ExpressApp.ReportsV2" Version="26.1.*" />
-    <PackageReference Include="DevExpress.ExpressApp.Scheduler" Version="26.1.*" />
-    <PackageReference Include="DevExpress.ExpressApp.Security" Version="26.1.*" />
-    <PackageReference Include="DevExpress.ExpressApp.Security.Xpo" Version="26.1.*" />
-    <PackageReference Include="DevExpress.ExpressApp.StateMachine" Version="26.1.*" />
-    <PackageReference Include="DevExpress.ExpressApp.TreeListEditors" Version="26.1.*" />
-    <PackageReference Include="DevExpress.ExpressApp.Validation" Version="26.1.*" />
-    <PackageReference Include="DevExpress.ExpressApp.ViewVariantsModule" Version="26.1.*" />
-    <PackageReference Include="DevExpress.ExpressApp.Xpo" Version="26.1.*" />
-    <PackageReference Include="DevExpress.Persistent.Base" Version="26.1.*" />
-    <PackageReference Include="DevExpress.Persistent.BaseImpl.Xpo" Version="26.1.*" />
+    <PackageReference Include="DevExpress.ExpressApp" Version="26.1.5" />
+    <PackageReference Include="DevExpress.ExpressApp.AI" Version="26.1.5" />
+    <PackageReference Include="DevExpress.ExpressApp.AuditTrail.Xpo" Version="26.1.5" />
+    <PackageReference Include="DevExpress.ExpressApp.Chart" Version="26.1.5" />
+    <PackageReference Include="DevExpress.ExpressApp.CloneObject" Version="26.1.5" />
+    <PackageReference Include="DevExpress.ExpressApp.CodeAnalysis" Version="26.1.5" />
+    <PackageReference Include="DevExpress.ExpressApp.ConditionalAppearance" Version="26.1.5" />
+    <PackageReference Include="DevExpress.ExpressApp.Dashboards" Version="26.1.5" />
+    <PackageReference Include="DevExpress.ExpressApp.Notifications" Version="26.1.5" />
+    <PackageReference Include="DevExpress.ExpressApp.Office" Version="26.1.5" />
+    <PackageReference Include="DevExpress.ExpressApp.PivotGrid" Version="26.1.5" />
+    <PackageReference Include="DevExpress.ExpressApp.ReportsV2" Version="26.1.5" />
+    <PackageReference Include="DevExpress.ExpressApp.Scheduler" Version="26.1.5" />
+    <PackageReference Include="DevExpress.ExpressApp.Security" Version="26.1.5" />
+    <PackageReference Include="DevExpress.ExpressApp.Security.Xpo" Version="26.1.5" />
+    <PackageReference Include="DevExpress.ExpressApp.StateMachine" Version="26.1.5" />
+    <PackageReference Include="DevExpress.ExpressApp.TreeListEditors" Version="26.1.5" />
+    <PackageReference Include="DevExpress.ExpressApp.Validation" Version="26.1.5" />
+    <PackageReference Include="DevExpress.ExpressApp.ViewVariantsModule" Version="26.1.5" />
+    <PackageReference Include="DevExpress.ExpressApp.Xpo" Version="26.1.5" />
+    <PackageReference Include="DevExpress.Persistent.Base" Version="26.1.5" />
+    <PackageReference Include="DevExpress.Persistent.BaseImpl.Xpo" Version="26.1.5" />
     <PackageReference Include="Azure.Identity" Version="1.21.0" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="7.0.2" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.21.0" />
