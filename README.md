@@ -2,7 +2,8 @@
 
 This topic describes how to host an [XAF Blazor](https://docs.devexpress.com/eXpressAppFramework/401675/overview/supported-ui-platforms) application inside an [Electron](https://www.electronjs.org/) desktop shell using the [ElectronNET.Core](https://github.com/ElectronNET/Electron.NET) library.
 
-The integration is **opt-in**. The application continues to run as a regular web application in a browser, and runs as an Electron desktop application only when the `USE_ELECTRON` configuration setting is `true`. You can use a single codebase for both web and desktop deployments.
+> [!IMPORTANT]
+> This example references ElectronNET.Core **0.6.0** and may not be updated for newer versions. Electron.NET is a third-party library and its setup instructions, APIs, and package names can change between releases. Before you integrate Electron.NET into your application, check the [official Electron.NET documentation](https://github.com/ElectronNET/Electron.NET) for the current instructions.
 
 ## Prerequisites
 
