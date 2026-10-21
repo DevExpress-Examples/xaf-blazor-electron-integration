@@ -1,0 +1,35 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <!-- meta name="theme-color" content="#000000" -->
+    <HeadOutlet />
+    <PageTitle>ElectronExample</PageTitle>
+    <base href="/" />
+    <ImportMap />
+    <BootstrapThemeLink />
+    <link href="@Assets["_content/DevExpress.ExpressApp.Blazor/styles.css"]" rel="stylesheet" />
+    <link href="@Assets["css/site.css"]" rel="stylesheet" />
+    <link href="@Assets["ElectronExample.Blazor.Server.styles.css"]" rel="stylesheet" />
+    @DxResourceManager.RegisterScripts()
+</head>
+<body>
+    <SplashScreen Caption="ElectronExample" ImagePath="images/SplashScreen.svg" />
+    <app class="d-none">
+        <Routes @rendermode="InteractiveServerWithoutPrerendering" />
+    </app>
+    <AlertsHandler @rendermode="InteractiveServerWithoutPrerendering" />
+    <div id="blazor-error-ui">
+        <BlazorError />
+    </div>
+    <ReconnectModal />
+    <script src="@Assets["_framework/blazor.web.js"]"></script>
+</body>
+</html>
+@code {
+    public static IComponentRenderMode InteractiveServerWithoutPrerendering { get; } =
+        new InteractiveServerRenderMode(prerender: false);
+}
