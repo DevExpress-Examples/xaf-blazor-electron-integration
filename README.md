@@ -15,21 +15,24 @@ This topic describes how to host an [XAF Blazor](https://docs.devexpress.com/eXp
 
 | Requirement | Version |
 |---|---|
-| .NET SDK | 8.0 or later |
+| .NET SDK | 10.0 or later (the example projects target `net10.0`) |
 | Node.js | 22.x or later (must be available in `PATH`) |
 | XAF Blazor Server application | Created with the [Template Kit](https://docs.devexpress.com/eXpressAppFramework/405447/installation-upgrade-version-history/visual-studio-integration/template-kit) |
 
 To check the installed Node.js version, run the following command:
 
-```powershell
+```shell
 node --version
 ```
+
+> [!NOTE]
+> The example solution uses SQL Server LocalDB, which is available on Windows only. To run the example on macOS, see [Run the Example on macOS](#run-the-example-on-macos).
 
 ## Step 1. Add NuGet Packages
 
 Add the following packages to the *YourApplicationName.Blazor.Server* project:
 
-```powershell
+```shell
 dotnet add package ElectronNET.Core
 dotnet add package ElectronNET.Core.AspNet
 ```
@@ -103,7 +106,7 @@ The rest of the XAF pipeline (`AddXaf`, Security System configuration, `UseXaf`,
 
 ### Disable HTTPS Redirection in Electron Mode
 
-logs the "Failed to determine the https port for redirect" warning.
+In Electron mode, the application listens on HTTP only. If you call `UseHttpsRedirection`, the middleware cannot determine the HTTPS port and logs the "Failed to determine the https port for redirect" warning. Call `UseHttpsRedirection` only if the application does not run in Electron mode:
 
 ```csharp
 if (!useElectron) {
@@ -132,10 +135,15 @@ Open the *YourApplicationName.Blazor.Server/Properties/launchSettings.json* file
 
 ## Step 5. Run the Application
 
-1. If your solution uses the [Middle Tier Security](https://docs.devexpress.com/eXpressAppFramework/404389/data-security-and-safety/security-system/security-tiers/middle-tier-security), start the *YourApplicationName.MiddleTierWebApi* project first.
+1. If your solution uses the [Middle Tier Security](https://docs.devexpress.com/eXpressAppFramework/404389/data-security-and-safety/security-system/security-tiers/middle-tier-security), start the *YourApplicationName.MiddleTierWebApi* project first. In the example solution, run the following command in the *ElectronExample.MiddleTier* folder:
+
+   ```shell
+   dotnet run --launch-profile ElectronExample.MiddleTier
+   ```
+
 2. Run the *YourApplicationName.Blazor.Server* project with the **Electron** launch profile:
-   - In Visual Studio, select the **Electron** profile and press **F5**.
-   - In the command line, run `dotnet run --launch-profile Electron`.
+   - In Visual Studio or JetBrains Rider, select the **Electron** profile and start the project.
+   - In the command line, run `dotnet run --launch-profile Electron` in the project folder.
 3. The first run restores and installs Electron npm packages, so it takes longer than subsequent runs.
 4. A desktop window opens and displays the XAF application's logon page.
 
@@ -234,6 +242,64 @@ You can use the same pattern to call other Electron.NET APIs from XAF Controller
 | `Electron.Clipboard` | Read and write the system clipboard. |
 | `Electron.Shell.OpenExternalAsync` | Open a URL in the default browser. |
 | `Electron.Menu.SetApplicationMenu` | A native application menu. |
+
+## Run the Example on macOS
+
+The example solution runs on macOS (tested on Apple silicon) with the following changes.
+
+### Use SQLite Instead of LocalDB
+
+The *ElectronExample.MiddleTier/appsettings.json* file specifies a SQL Server LocalDB connection string. LocalDB is available on Windows only. To use SQLite instead, follow the steps below:
+
+1. Add the `Microsoft.Data.Sqlite` package to the *ElectronExample.MiddleTier* project:
+
+   ```shell
+   dotnet add CS/ElectronExample.MiddleTier package Microsoft.Data.Sqlite
+   ```
+
+2. Override the connection string with an environment variable when you start the Middle Tier server:
+
+   ```shell
+   cd CS/ElectronExample.MiddleTier
+   ConnectionStrings__ConnectionString="XpoProvider=SQLite;Data Source=ElectronExample.db" \
+     dotnet run --launch-profile ElectronExample.MiddleTier
+   ```
+
+   The server creates the database and the demo users on the first run.
+
+The Middle Tier server also listens on HTTPS and requires a trusted development certificate. If the certificate is missing, run `dotnet dev-certs https --trust`.
+
+### Start the Electron Application
+
+In a separate terminal, run the following commands:
+
+```shell
+cd CS/ElectronExample.Blazor.Server
+dotnet run --launch-profile Electron
+```
+
+To log in, use the **Admin** or **User** user name with an empty password.
+
+### Troubleshooting: The Electron Window Does Not Open
+
+ElectronNET.Core 0.6.0 uses Electron 30.4.0. With Node.js 24, the Electron npm `postinstall` script can finish without errors but extract an incomplete *Electron.app* bundle. In this case, the Electron window does not open and the console displays the following error:
+
+```
+dyld: Library not loaded: @rpath/Electron Framework.framework/Electron Framework
+```
+
+To fix this issue, extract the Electron bundle from the npm cache manually and run the application without a rebuild:
+
+```shell
+cd CS/ElectronExample.Blazor.Server/bin/Debug/net10.0/.electron/node_modules/electron
+rm -rf dist && mkdir dist
+ditto -x -k ~/Library/Caches/electron/*/electron-v30.4.0-darwin-*.zip dist
+printf 'Electron.app/Contents/MacOS/Electron' > path.txt
+cd ../../../../../..
+dotnet run --no-build --launch-profile Electron
+```
+
+A full rebuild can reinstall Electron npm packages. If the error appears again, repeat these steps.
 
 ## See Also
 - [ElectronNET.Core on GitHub](https://github.com/ElectronNET/Electron.NET)
