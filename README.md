@@ -280,27 +280,6 @@ dotnet run --launch-profile Electron
 
 To log in, use the **Admin** or **User** user name with an empty password.
 
-### Troubleshooting: The Electron Window Does Not Open
-
-ElectronNET.Core 0.6.0 uses Electron 30.4.0. With Node.js 24, the Electron npm `postinstall` script can finish without errors but extract an incomplete *Electron.app* bundle. In this case, the Electron window does not open and the console displays the following error:
-
-```
-dyld: Library not loaded: @rpath/Electron Framework.framework/Electron Framework
-```
-
-To fix this issue, extract the Electron bundle from the npm cache manually and run the application without a rebuild:
-
-```shell
-cd CS/ElectronExample.Blazor.Server/bin/Debug/net10.0/.electron/node_modules/electron
-rm -rf dist && mkdir dist
-ditto -x -k ~/Library/Caches/electron/*/electron-v30.4.0-darwin-*.zip dist
-printf 'Electron.app/Contents/MacOS/Electron' > path.txt
-cd ../../../../../..
-dotnet run --no-build --launch-profile Electron
-```
-
-A full rebuild can reinstall Electron npm packages. If the error appears again, repeat these steps.
-
 ## See Also
 - [ElectronNET.Core on GitHub](https://github.com/ElectronNET/Electron.NET)
 - [Electron Documentation](https://www.electronjs.org/docs/latest)
