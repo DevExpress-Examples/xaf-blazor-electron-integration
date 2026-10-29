@@ -4,12 +4,16 @@
 [![](https://img.shields.io/badge/📖_How_to_use_DevExpress_Examples-e9f6fc?style=flat-square)](https://docs.devexpress.com/GeneralInformation/403183)
 [![](https://img.shields.io/badge/💬_Leave_Feedback-feecdd?style=flat-square)](#does-this-example-address-your-development-requirementsobjectives)
 <!-- default badges end -->
-# How to: Run an XAF Blazor Application as a Desktop Application with Electron.NET
+# XAF - Use Blazor UI with Electron as a hybrid Windows/macOS Desktop Application
 
-This topic describes how to host an [XAF Blazor](https://docs.devexpress.com/eXpressAppFramework/401675/overview/supported-ui-platforms) application inside an [Electron](https://www.electronjs.org/) desktop shell using the [ElectronNET.Core](https://github.com/ElectronNET/Electron.NET) library.
+In this GitHub example, an [XAF Blazor](https://docs.devexpress.com/eXpressAppFramework/401675/overview/supported-ui-platforms) app is wrapped inside a native "web view" container ([Electron](https://www.electronjs.org/) desktop shell) for the target OS and connected to our [Middle Tier](https://docs.devexpress.com/eXpressAppFramework/404389/data-security-and-safety/security-system/security-tiers/middle-tier-security) application server.
+
+This approach allows XAF developers to deliver both Windows and non-Windows support when WinForms and browser-based apps do not meet client needs. For end users, this hybrid desktop app feels and behaves (performance-wise) no differently than Microsoft Teams, Visual Studio Code, Outlook (new), and similar hybrid apps. For many, this web-based approach can be an alternative to native WinForms/WPF/VCL/Avalonia desktop development ("write once, run everywhere").
+
+![Application run on Mac OS](application-on-mac.png)
 
 > [!IMPORTANT]
-> This example references ElectronNET.Core **0.6.0** and may not be updated for newer versions. Electron.NET is a third-party library and its setup instructions, APIs, and package names can change between releases. Before you integrate Electron.NET into your application, check the [official Electron.NET documentation](https://github.com/ElectronNET/Electron.NET) for the current instructions.
+> This example references [ElectronNET.Core](https://github.com/ElectronNET/Electron.NET) **0.6.0** and may not be updated for newer versions. Electron.NET is a third-party library and its setup instructions, APIs, and package names can change between releases. Before you integrate Electron.NET into your application, check the [official Electron.NET documentation](https://github.com/ElectronNET/Electron.NET) for the current instructions.
 
 ## Prerequisites
 
@@ -17,20 +21,23 @@ This topic describes how to host an [XAF Blazor](https://docs.devexpress.com/eXp
 |---|---|
 | .NET SDK | 8.0 or later (the example projects target `net10.0`) |
 | Node.js | 22.x or later (must be available in `PATH`) |
-| XAF Blazor Server application | Created with the [Template Kit](https://docs.devexpress.com/eXpressAppFramework/405447/installation-upgrade-version-history/visual-studio-integration/template-kit) |
+| XAF Blazor Server application with enabled [Middle Tier Security](https://docs.devexpress.com/eXpressAppFramework/404389/data-security-and-safety/security-system/security-tiers/middle-tier-security) | Created with the [Template Kit](https://docs.devexpress.com/eXpressAppFramework/405447/installation-upgrade-version-history/visual-studio-integration/template-kit) |
 
-To check the installed Node.js version, run the following command:
-
-```shell
-node --version
-```
+> [!TIP]
+> Run the following command to check the installed Node.js version:
+> 
+> ```shell
+> node --version
+> ```
 
 > [!NOTE]
 > The example solution uses SQL Server LocalDB, which is available on Windows only. To run the example on macOS, see [Run the Example on macOS](#run-the-example-on-macos).
 
-## Step 1. Add NuGet Packages
+## Implementation Details
 
-Add the following packages to the *YourApplicationName.Blazor.Server* project:
+### Step 1. Add NuGet Packages
+
+Add the following packages to the *ApplicationName.Blazor.Server* project:
 
 ```shell
 dotnet add package ElectronNET.Core
@@ -47,9 +54,9 @@ The project file should contain the following references:
 > [!NOTE]
 > ElectronNET.Core does not require the legacy `electronize` CLI tool or the `electron.manifest.json` file. The library configures the Electron host through MSBuild.
 
-## Step 2. Register Electron in the Application Builder
+### Step 2. Register Electron in the Application Builder
 
-Open the *YourApplicationName.Blazor.Server/Program.cs* file and add the following namespaces:
+Open the *ApplicationName.Blazor.Server/Program.cs* file and add the following namespaces:
 
 ```csharp
 using ElectronNET.API;
@@ -61,26 +68,26 @@ Register Electron services conditionally. Add the following code after the `WebA
 ```csharp
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
-	.AddInteractiveServerComponents();
+    .AddInteractiveServerComponents();
 
 bool useElectron = builder.Configuration.GetValue<bool>("USE_ELECTRON");
 if (useElectron) {
-	builder.Services.AddElectron();
-	builder.UseElectron(args, async () => {
-		var options = new BrowserWindowOptions {
-			Show = false,
-			IsRunningBlazor = true,
-		};
-		if (OperatingSystem.IsWindows() || OperatingSystem.IsLinux()) {
-			options.AutoHideMenuBar = true;
-		}
-		var browserWindow = await Electron.WindowManager.CreateWindowAsync(options);
-		browserWindow.OnReadyToShow += () => browserWindow.Show();
-	});
+    builder.Services.AddElectron();
+    builder.UseElectron(args, async () => {
+        var options = new BrowserWindowOptions {
+            Show = false,
+            IsRunningBlazor = true,
+        };
+        if (OperatingSystem.IsWindows() || OperatingSystem.IsLinux()) {
+            options.AutoHideMenuBar = true;
+        }
+        var browserWindow = await Electron.WindowManager.CreateWindowAsync(options);
+        browserWindow.OnReadyToShow += () => browserWindow.Show();
+    });
 }
 
 builder.Services.AddXaf(builder.Configuration, b => {
-	// ...
+    // ...
 });
 ```
 
@@ -90,66 +97,70 @@ The code above does the following:
 - `Show = false` in combination with the `OnReadyToShow` event handler prevents an empty window from being displayed while the XAF application loads.
 - The `USE_ELECTRON` check keeps the default browser hosting unchanged. Do not call `UseElectron` if the setting is not specified.
 
-## Step 3. Resolve the App Component Name Conflict
+### Step 3. Resolve the App Component Name Conflict
 
 The `ElectronNET.API` namespace contains an `App` type. After you add the `using ElectronNET.API;` directive, the `App` identifier conflicts with the Blazor root component and the build fails with the [CS0104](https://learn.microsoft.com/en-us/dotnet/csharp/misc/cs0104) error.
 
 To resolve this conflict, specify the fully qualified name of the root component in the `MapRazorComponents` call:
 
 ```csharp
-app.MapRazorComponents<YourApplicationName.Blazor.Server.Components.App>()
-	.AddInteractiveServerRenderMode()
-	.AddAdditionalAssemblies(typeof(BlazorApplication).Assembly);
+app.MapRazorComponents<ApplicationName.Blazor.Server.Components.App>()
+    .AddInteractiveServerRenderMode()
+    .AddAdditionalAssemblies(typeof(BlazorApplication).Assembly);
 ```
 
 The rest of the XAF pipeline (`AddXaf`, Security System configuration, `UseXaf`, and `MapXafEndpoints`) does not require changes.
 
-### Disable HTTPS Redirection in Electron Mode
+#### Disable HTTPS Redirection in Electron Mode
 
 In Electron mode, the application listens on HTTP only. If you call `UseHttpsRedirection`, the middleware cannot determine the HTTPS port and logs the "Failed to determine the https port for redirect" warning. Call `UseHttpsRedirection` only if the application does not run in Electron mode:
 
 ```csharp
 if (!useElectron) {
-	app.UseHttpsRedirection();
+    app.UseHttpsRedirection();
 }
 ```
 
 Traffic between the Electron window and Kestrel does not leave the local machine, so HTTPS is not required. `UseHsts` does not need changes: the HSTS middleware ignores `localhost` by default.
 
-## Step 4. Add an Electron Launch Profile
+### Step 4. Add an Electron Launch Profile
 
-Open the *YourApplicationName.Blazor.Server/Properties/launchSettings.json* file and add a profile that sets the `USE_ELECTRON` environment variable and disables browser launch:
+Open the *ApplicationName.Blazor.Server/Properties/launchSettings.json* file and add a profile that sets the `USE_ELECTRON` environment variable and disables browser launch:
 
 ```json
 "Electron": {
-  "commandName": "Project",
-  "dotnetRunMessages": true,
-  "launchBrowser": false,
-  "applicationUrl": "http://localhost:5000",
-  "environmentVariables": {
-	"ASPNETCORE_ENVIRONMENT": "Development",
-	"USE_ELECTRON": "true"
+    "commandName": "Project",
+    "dotnetRunMessages": true,
+    "launchBrowser": false,
+    "applicationUrl": "http://localhost:5000",
+    "environmentVariables": {
+    "ASPNETCORE_ENVIRONMENT": "Development",
+    "USE_ELECTRON": "true"
   }
 }
 ```
 
-## Step 5. Run the Application
+### Step 5. Run the Application
 
-1. If your solution uses the [Middle Tier Security](https://docs.devexpress.com/eXpressAppFramework/404389/data-security-and-safety/security-system/security-tiers/middle-tier-security), start the *YourApplicationName.MiddleTierWebApi* project first. In the example solution, run the following command in the *ElectronExample.MiddleTier* folder:
+1. Start the *ApplicationName.MiddleTierWebApi* project ([Middle Tier Security](https://docs.devexpress.com/eXpressAppFramework/404389/data-security-and-safety/security-system/security-tiers/middle-tier-security) server) first.
+
+    In the example solution, run the following command in the *ElectronExample.MiddleTier* folder:
 
    ```shell
    dotnet run --launch-profile ElectronExample.MiddleTier
    ```
 
-2. Run the *YourApplicationName.Blazor.Server* project with the **Electron** launch profile:
+    For hybrid Electron usage scenarios, we recommend that you always use XAF Blazor UI with the [Middle Tier Security](https://docs.devexpress.com/eXpressAppFramework/404389/data-security-and-safety/security-system/security-tiers/middle-tier-security) for secure communication between the frontend and backend, helping to protect sensitive data and enforce stricter access controls.
+
+2. Run the *ApplicationName.Blazor.Server* project with the **Electron** launch profile:
    - In Visual Studio or JetBrains Rider, select the **Electron** profile and start the project.
    - In the command line, run `dotnet run --launch-profile Electron` in the project folder.
 3. The first run restores and installs Electron npm packages, so it takes longer than subsequent runs.
-4. A desktop window opens and displays the XAF application's logon page.
+4. A desktop window opens and displays the XAF application's logon page. Use the **Admin** or **User** user name with an empty password to log in.
 
 To run the application in a browser, use any other launch profile. The application then behaves as a standard XAF Blazor application.
 
-## Step 6. (Optional) Use Native Electron APIs from XAF Actions
+### Step 6. (Optional) Use Native Electron APIs from XAF Actions
 
 In this setup, the XAF Blazor application and the Electron shell run on the same machine. The .NET process hosts the Kestrel server, and Electron displays it in a native window. This allows XAF Controllers to call the Electron.NET API (the static `Electron` class) and access native OS features that a regular browser cannot reach: message boxes, file dialogs, notifications, the system tray, the clipboard, and so on.
 
@@ -163,7 +174,7 @@ How it works:
 > [!NOTE]
 > Native APIs work only when the application runs with the **Electron** launch profile. In a regular browser, the Electron process does not exist. Use the `HybridSupport.IsElectronActive` property to deactivate Electron-specific Actions in this case.
 
-### Example: Show a Native Message Box
+#### Example: Show a Native Message Box
 
 The *ElectronExample.Blazor.Server/Controllers/ElectronMessageBoxController.cs* file in the example solution implements a Window Controller with the **Native Message Box** [SimpleAction](https://docs.devexpress.com/eXpressAppFramework/DevExpress.ExpressApp.Actions.SimpleAction). The Action shows a native Electron message box:
 
@@ -174,7 +185,7 @@ using DevExpress.Persistent.Base;
 using ElectronNET.API;
 using ElectronNET.API.Entities;
 
-namespace YourApplicationName.Blazor.Server.Controllers;
+namespace ApplicationName.Blazor.Server.Controllers;
 
 public class ElectronMessageBoxController : WindowController {
     public ElectronMessageBoxController() {
@@ -281,8 +292,10 @@ dotnet run --launch-profile Electron
 To log in, use the **Admin** or **User** user name with an empty password.
 
 ## See Also
+
 - [ElectronNET.Core on GitHub](https://github.com/ElectronNET/Electron.NET)
 - [Electron Documentation](https://www.electronjs.org/docs/latest)
+
 <!-- feedback -->
 ## Does This Example Address Your Development Requirements/Objectives?
 
