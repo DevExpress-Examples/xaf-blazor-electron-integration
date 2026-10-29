@@ -17,11 +17,9 @@ This approach allows XAF developers to deliver both Windows and non-Windows supp
 
 ## Prerequisites
 
-| Requirement | Version |
-|---|---|
-| .NET SDK | 8.0 or later (the example projects target `net10.0`) |
-| Node.js | 22.x or later (must be available in `PATH`) |
-| XAF Blazor Server application with enabled [Middle Tier Security](https://docs.devexpress.com/eXpressAppFramework/404389/data-security-and-safety/security-system/security-tiers/middle-tier-security) | Created with the [Template Kit](https://docs.devexpress.com/eXpressAppFramework/405447/installation-upgrade-version-history/visual-studio-integration/template-kit) |
+* .NET SDK 8.0 or later (the example projects target `net10.0`)
+* Node.js 22.x or later (must be available in `PATH`)
+* XAF Blazor Server application with enabled [Middle Tier Security](https://docs.devexpress.com/eXpressAppFramework/404389/data-security-and-safety/security-system/security-tiers/middle-tier-security) created with the [Template Kit](https://docs.devexpress.com/eXpressAppFramework/405447/installation-upgrade-version-history/visual-studio-integration/template-kit)
 
 > [!TIP]
 > Run the following command to check the installed Node.js version:
