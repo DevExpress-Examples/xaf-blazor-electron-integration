@@ -174,7 +174,7 @@ How it works:
 
 #### Example: Show a Native Message Box
 
-The *ElectronExample.Blazor.Server/Controllers/ElectronMessageBoxController.cs* file in the example solution implements a Window Controller with the **Native Message Box** [SimpleAction](https://docs.devexpress.com/eXpressAppFramework/DevExpress.ExpressApp.Actions.SimpleAction). The Action shows a native Electron message box:
+The *ElectronExample.Blazor.Server/Controllers/ElectronMessageBoxController.cs* file in the example solution implements a Window Controller with the **Native Message Box**: [SimpleAction](https://docs.devexpress.com/eXpressAppFramework/DevExpress.ExpressApp.Actions.SimpleAction). The Action shows a native Electron message box:
 
 ```csharp
 using DevExpress.ExpressApp;
@@ -239,18 +239,18 @@ if (result.Response == 0) {
 
 To test the Action, run the application with the **Electron** launch profile and click **Native Message Box** in the toolbar.
 
-### Other Native APIs
+#### Other Native APIs
 
 You can use the same pattern to call other Electron.NET APIs from XAF Controllers:
 
 | API | Purpose |
 |---|---|
-| `Electron.Dialog.ShowOpenDialogAsync` / `ShowSaveDialogAsync` | Native file open and save dialogs. |
-| `Electron.Notification.Show` | OS notifications. |
-| `Electron.Tray` | A system tray icon and menu. |
-| `Electron.Clipboard` | Read and write the system clipboard. |
-| `Electron.Shell.OpenExternalAsync` | Open a URL in the default browser. |
-| `Electron.Menu.SetApplicationMenu` | A native application menu. |
+| `Electron.Dialog.ShowOpenDialogAsync` / `ShowSaveDialogAsync` | Native file open and save dialogs |
+| `Electron.Notification.Show` | OS notifications |
+| `Electron.Tray` | A system tray icon and menu |
+| `Electron.Clipboard` | Read and write the system clipboard |
+| `Electron.Shell.OpenExternalAsync` | Open a URL in the default browser |
+| `Electron.Menu.SetApplicationMenu` | A native application menu |
 
 ## Run the Example on macOS
 
