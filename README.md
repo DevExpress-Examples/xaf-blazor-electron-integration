@@ -15,7 +15,7 @@ This topic describes how to host an [XAF Blazor](https://docs.devexpress.com/eXp
 
 | Requirement | Version |
 |---|---|
-| .NET SDK | 10.0 or later (the example projects target `net10.0`) |
+| .NET SDK | 8.0 or later (the example projects target `net10.0`) |
 | Node.js | 22.x or later (must be available in `PATH`) |
 | XAF Blazor Server application | Created with the [Template Kit](https://docs.devexpress.com/eXpressAppFramework/405447/installation-upgrade-version-history/visual-studio-integration/template-kit) |
 
