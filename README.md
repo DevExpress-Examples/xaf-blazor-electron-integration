@@ -29,7 +29,7 @@ This approach allows you to support both Windows and non-Windows operating syste
 > ```
 
 > [!NOTE]
-> The example solution uses SQL Server LocalDB, which is available on Windows only. To run the example on macOS, see [Run the Example on macOS](#run-the-example-on-macos).
+> The example solution uses SQL Server LocalDB (Windows only). To run the example on macOS, see [Run the Example on macOS](#run-the-example-on-macos).
 
 ## Implementation Details
 
@@ -99,7 +99,7 @@ The code above does the following:
 
 The `ElectronNET.API` namespace contains an `App` type. After you add the `using ElectronNET.API;` directive, the `App` identifier conflicts with the Blazor root component and the build fails with the [CS0104](https://learn.microsoft.com/en-us/dotnet/csharp/misc/cs0104) error.
 
-To resolve this conflict, specify the fully qualified name of the root component in the `MapRazorComponents` call:
+To resolve this conflict, specify the fully qualified name of the root component in the `MapRazorComponents` method call:
 
 ```csharp
 app.MapRazorComponents<ApplicationName.Blazor.Server.Components.App>()
