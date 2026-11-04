@@ -6,9 +6,9 @@
 <!-- default badges end -->
 # XAF - Use Blazor UI with Electron as a hybrid Windows/macOS Desktop Application
 
-In this GitHub example, an [XAF Blazor](https://docs.devexpress.com/eXpressAppFramework/401675/overview/supported-ui-platforms) app is wrapped inside a native "web view" container ([Electron](https://www.electronjs.org/) desktop shell) for the target OS and connected to our [Middle Tier](https://docs.devexpress.com/eXpressAppFramework/404389/data-security-and-safety/security-system/security-tiers/middle-tier-security) application server.
+In this GitHub example, an [ XAF-powered Blazor](https://docs.devexpress.com/eXpressAppFramework/401675/overview/supported-ui-platforms) app is wrapped inside a native "web view" container ([Electron](https://www.electronjs.org/) desktop shell) for the target OS and connected to our [Middle Tier](https://docs.devexpress.com/eXpressAppFramework/404389/data-security-and-safety/security-system/security-tiers/middle-tier-security) application server.
 
-This approach allows you to support both Windows and non-Windows operating systems when WinForms and browser-based apps do not meet your business needs. For users, this hybrid desktop app feels and behaves (performance-wise) no differently than Microsoft Teams, Visual Studio Code, Outlook (new), and similar hybrid apps. Such web-based approach can be an alternative to native WinForms/WPF/VCL/Avalonia desktop development ("write once, run everywhere").
+By employing strategies outlined in this example, you can deliver XAF-powered solutions that target both Windows and non-Windows operating systems (when WinForms/Windows or browser-based apps do not fully address your business needs). For end users, the hybrid desktop solution documented herein will feel and behave (performance-wise) no different than Microsoft Teams, Visual Studio Code, Outlook (new), and similar hybrid apps. This web-based approach can serve as an alternative to native WinForms/WPF/VCL/Avalonia desktop development ("write once, run everywhere").
 
 ![Application run on Mac OS](application-on-mac.png)
 
@@ -19,7 +19,7 @@ This approach allows you to support both Windows and non-Windows operating syste
 
 * .NET SDK 8.0 or later (the example projects target `net10.0`)
 * Node.js 22.x or later (must be available in `PATH`)
-* XAF Blazor Server application with [Middle Tier Security](https://docs.devexpress.com/eXpressAppFramework/404389/data-security-and-safety/security-system/security-tiers/middle-tier-security) enabled. You can create such an application using the [Template Kit](https://docs.devexpress.com/eXpressAppFramework/405447/installation-upgrade-version-history/visual-studio-integration/template-kit)
+* XAF Blazor Server application with [Middle Tier Security](https://docs.devexpress.com/eXpressAppFramework/404389/data-security-and-safety/security-system/security-tiers/middle-tier-security) enabled. You can create this application using our [Template Kit](https://docs.devexpress.com/eXpressAppFramework/405447/installation-upgrade-version-history/visual-studio-integration/template-kit)
 
 > [!TIP]
 > Run the following command to check the installed Node.js version:
@@ -61,7 +61,7 @@ using ElectronNET.API;
 using ElectronNET.API.Entities;
 ```
 
-Register Electron services conditionally. Add the following code after the `WebApplication.CreateBuilder` method call and the `AddRazorComponents` registration, and before the `AddXaf` method call:
+Register Electron services conditionally. Add the following code after the `WebApplication.CreateBuilder` method call, `AddRazorComponents` registration, and before the `AddXaf` method call:
 
 ```csharp
 var builder = WebApplication.CreateBuilder(args);
@@ -89,15 +89,15 @@ builder.Services.AddXaf(builder.Configuration, b => {
 });
 ```
 
-The code above does the following:
+The code referenced above performs the following:
 
 - `IsRunningBlazor = true` configures the Electron renderer so that the Blazor SignalR circuit works correctly.
 - `Show = false` in combination with the `OnReadyToShow` event handler prevents an empty window from being displayed while the XAF application loads.
-- The `USE_ELECTRON` check keeps the default browser hosting unchanged. Do not call `UseElectron` if the setting is not specified.
+- The `USE_ELECTRON` check keeps default browser hosting unchanged. Do not call `UseElectron` if the setting is not specified.
 
 ### Step 3. Resolve the App Component Name Conflict
 
-The `ElectronNET.API` namespace contains an `App` type. After you add the `using ElectronNET.API;` directive, the `App` identifier conflicts with the Blazor root component and the build fails with the [CS0104](https://learn.microsoft.com/en-us/dotnet/csharp/misc/cs0104) error.
+The `ElectronNET.API` namespace contains an `App` type. After you add the `using ElectronNET.API;` directive, the `App` identifier conflicts with the Blazor root component and the build fails with a [CS0104](https://learn.microsoft.com/en-us/dotnet/csharp/misc/cs0104) error.
 
 To resolve this conflict, specify the fully qualified name of the root component in the `MapRazorComponents` method call:
 
@@ -107,11 +107,11 @@ app.MapRazorComponents<ApplicationName.Blazor.Server.Components.App>()
     .AddAdditionalAssemblies(typeof(BlazorApplication).Assembly);
 ```
 
-The rest of the XAF pipeline (`AddXaf`, Security System configuration, `UseXaf`, and `MapXafEndpoints`) does not require changes.
+The rest of the XAF pipeline (`AddXaf`, Security System configuration, `UseXaf`, and `MapXafEndpoints`) does not require modification.
 
 #### Disable HTTPS Redirection in Electron Mode
 
-In Electron mode, the application listens to HTTP only. If you call `UseHttpsRedirection`, the middleware cannot determine the HTTPS port and logs the _Failed to determine the https port for redirect_ warning. Call `UseHttpsRedirection` only if the application does not run in Electron mode:
+In Electron mode, the application listens to HTTP only. If you call `UseHttpsRedirection`, the middleware cannot determine the HTTPS port and logs a _Failed to determine the https port for redirect_ warning. Call `UseHttpsRedirection` only if the application does not run in Electron mode:
 
 ```csharp
 if (!useElectron) {
@@ -119,7 +119,7 @@ if (!useElectron) {
 }
 ```
 
-Traffic between Electron window and Kestrel does not leave the local machine, so HTTPS is not required. `UseHsts` does not need changes: the HSTS middleware ignores `localhost` by default.
+Traffic between Electron window and Kestrel does not leave the local machine, so HTTPS is not required. `UseHsts` does not need modification: HSTS middleware ignores `localhost` by default.
 
 ### Step 4. Add an Electron Launch Profile
 
@@ -154,26 +154,25 @@ Open the *ApplicationName.Blazor.Server/Properties/launchSettings.json* file and
    - In Visual Studio or JetBrains Rider, select the **Electron** profile and start the project.
    - In the command line, run `dotnet run --launch-profile Electron` in the project folder.
     The first run restores and installs Electron npm packages, so it takes longer than subsequent runs.
-3. A desktop window opens and displays the XAF application's logon page. Use the **Admin** or **User** user name with an empty password to log in.
+3. A desktop window opens and displays the XAF application's logon page. Use the **Admin** or **User** credential with an empty password to log in.
 
 To run the application in a browser, use any other launch profile. The application then behaves as a standard XAF Blazor application.
 
 ### Step 6. (Optional) Use Native Electron APIs from XAF Actions
 
-In this setup, XAF Blazor application and Electron shell run on the same machine. The .NET process hosts the Kestrel server, and Electron displays it in a native window. This configuration allows XAF Controllers to call the Electron.NET API (the static `Electron` class) and access native OS features that a regular browser cannot reach: message boxes, file dialogs, notifications, the system tray, the clipboard, etc. This setup works as follows:
-
+In this setup, the XAF Blazor application and Electron shell run on the same machine. The .NET process hosts the Kestrel server, and Electron displays it in a native window. This configuration allows XAF Controllers to call the Electron.NET API (the static `Electron` class) and access native OS features that a standard browser cannot reach: message boxes, file dialogs, notifications, the system tray, the clipboard, etc. This setup works as follows:
 
 1. A user clicks an XAF Action in the Electron window.
-2. The Action's `Execute` event handler runs on the server (the local .NET process), as in any XAF Blazor application.
-3. The handler calls an Electron.NET API, for example, `Electron.Dialog.ShowMessageBoxAsync`.
+2. The Action's `Execute` event handler runs on the server (local .NET process), as in any XAF Blazor application.
+3. The handler calls an Electron.NET API, such as `Electron.Dialog.ShowMessageBoxAsync`.
 4. Electron.NET forwards the call to the Electron main process, which displays a native OS dialog.
 
 > [!NOTE]
-> Native APIs work only when the application runs with the **Electron** launch profile. In a regular browser, the Electron process does not exist. Use the `HybridSupport.IsElectronActive` property to deactivate Electron-specific Actions in this case.
+> Native APIs only work when the application runs with the **Electron** launch profile. In a standard browser, the Electron process does not exist. Use the `HybridSupport.IsElectronActive` property to deactivate Electron-specific Actions in such instances.
 
 #### Example: Show a Native Message Box
 
-The *ElectronExample.Blazor.Server/Controllers/ElectronMessageBoxController.cs* file in the example solution implements a Window Controller with a **Native Message Box** ([SimpleAction](https://docs.devexpress.com/eXpressAppFramework/DevExpress.ExpressApp.Actions.SimpleAction)). The Action shows a native Electron message box:
+The *ElectronExample.Blazor.Server/Controllers/ElectronMessageBoxController.cs* file in the example solution implements a Window Controller with a **Native Message Box** ([SimpleAction](https://docs.devexpress.com/eXpressAppFramework/DevExpress.ExpressApp.Actions.SimpleAction)). The Action displays a native Electron message box:
 
 ```csharp
 using DevExpress.ExpressApp;
@@ -217,11 +216,11 @@ public class ElectronMessageBoxController : WindowController {
 
 How the Controller works:
 
-- **Declare an XAF Action.** The Controller creates a `SimpleAction` and handles its `Execute` event. XAF renders the Action in the toolbar. You do not need custom Blazor markup.
-- **Activate the Controller in Electron mode only.** `Active["ElectronActive"] = HybridSupport.IsElectronActive` hides the Action when the application runs in a regular browser, where native APIs are unavailable.
-- **Call the native API in the `Execute` handler.** Configure the dialog with `MessageBoxOptions` and pass it to `Electron.Dialog.ShowMessageBoxAsync`. Electron.NET forwards the call to the Electron main process, which displays the native OS dialog.
-- **Pass the parent window.** `Electron.WindowManager.BrowserWindows.FirstOrDefault()` returns the application window. When you pass it to `ShowMessageBoxAsync`, the dialog is modal to this window.
-- **Handle exceptions.** The handler is `async void` because the `Execute` event is synchronous. Wrap the code in `try/catch` and log errors with `Tracing.Tracer.LogError`. Otherwise, an unhandled exception can terminate the application.
+- **Declare an XAF Action:** The Controller creates a `SimpleAction` and handles its `Execute` event. XAF renders the Action in the toolbar. You do not need custom Blazor markup.
+- **Activate the Controller in Electron mode only:** `Active["ElectronActive"] = HybridSupport.IsElectronActive` hides the Action when the application runs in a standard browser, where native APIs are unavailable.
+- **Call the native API in the `Execute` handler:** Configure the dialog with `MessageBoxOptions` and pass it to `Electron.Dialog.ShowMessageBoxAsync`. Electron.NET forwards the call to the Electron main process, which displays the native OS dialog.
+- **Pass the parent window:** `Electron.WindowManager.BrowserWindows.FirstOrDefault()` returns the application window. When you pass it to `ShowMessageBoxAsync`, the dialog is modal to this window.
+- **Handle exceptions:** The handler is `async void` because the `Execute` event is synchronous. Wrap the code in `try/catch` and log errors with `Tracing.Tracer.LogError`. Otherwise, an unhandled exception can terminate the application.
 
 To configure the dialog, use the `Type` (`info`, `warning`, `error`, `question`), `Title`, `Buttons`, `DefaultId`, `CancelId`, and `Detail` properties of `MessageBoxOptions`. `ShowMessageBoxAsync` returns a `MessageBoxResult` object. Its `Response` property contains the index of the clicked button. Use this value to implement a confirmation dialog:
 
@@ -257,7 +256,7 @@ The example solution runs on macOS (tested on Apple silicon) with the following 
 
 ### Use SQLite Instead of LocalDB
 
-The *ElectronExample.MiddleTier/appsettings.json* file specifies a SQL Server LocalDB connection string. LocalDB is available on Windows only. To use SQLite instead, follow the steps below:
+The *ElectronExample.MiddleTier/appsettings.json* file specifies a SQL Server LocalDB connection string. LocalDB is only available on Windows. To use SQLite instead, follow the steps below:
 
 1. Add the `Microsoft.Data.Sqlite` package to the *ElectronExample.MiddleTier* project:
 
@@ -273,7 +272,7 @@ The *ElectronExample.MiddleTier/appsettings.json* file specifies a SQL Server Lo
      dotnet run --launch-profile ElectronExample.MiddleTier
    ```
 
-   The server creates the database and the demo users on the first run.
+   The server creates the database and demo users on the first run.
 
 The Middle Tier server also listens to HTTPS and requires a trusted development certificate. If the certificate is missing, run `dotnet dev-certs https --trust`.
 
@@ -286,7 +285,7 @@ cd CS/ElectronExample.Blazor.Server
 dotnet run --launch-profile Electron
 ```
 
-To log in, use the **Admin** or **User** user name with an empty password.
+To log in, use the **Admin** or **User** credential with an empty password.
 
 ## See Also
 
